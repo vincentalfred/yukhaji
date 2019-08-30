@@ -49,6 +49,13 @@ func initRouter(router *httprouter.Router, handler *internal.Handler) {
 	router.PUT("/user/:userID", handler.EditUserByID)
 	router.DELETE("/user/:userID", handler.DeleteUserByID)
 
+	router.GET("/saving/:userID", handler.GetSavingByUserID)
+	router.POST("/saving", handler.InsertSaving)
+	router.PUT("/saving/:userID", handler.EditSaving)
+	router.PUT("/addbalance/:userID", handler.AddBalance)
+	router.PUT("/editenddate/:userID", handler.EditEndDate)
+	router.DELETE("/saving/:userID", handler.DeleteSavingByUserID)
+
 	// Single book API
 	router.GET("/book/:bookID", handler.GetBookByID)
 	router.POST("/book", handler.InsertBook)

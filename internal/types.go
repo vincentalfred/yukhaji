@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"time"
 )
 
 // Args used for this application
@@ -32,6 +33,15 @@ type Book struct {
 	Author string `json:"author"`
 	ISBN   string `json:"isbn"`
 	Stock  int64  `json:"stock"`
+}
+
+type Saving struct {
+	ID     	int	`json:"id"`
+	UserID 	int	`json:"user_id"`
+	Balance int	`json:"balance"`
+	Target 	int `json:"target"`
+	StartDate 	time.Time `json:"start_date"`
+	EndDate 	time.Time `json:"end_date"`
 }
 
 // LendRequest struct for receiving lend http request
