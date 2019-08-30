@@ -21,7 +21,8 @@ func (h *Handler) GetSavingByUserID(w http.ResponseWriter, r *http.Request, para
 		log.Printf("[internal][GetUserByID] invalid user_id :%+v\n", err)
 		return
 	}
-	query := fmt.Sprintf("SELECT id, user_id, balance, target, start_date, end_date FROM savings WHERE user_id = %d", userID)
+	/*
+	query := fmt.Sprintf("SELECT id, user_id, balance, target, start_date, end_date FROM savings WHERE user_id = %d LIMIT 1", userID)
 	rows, err := h.DB.Query(query)
 	if err != nil {
 		log.Println(err)
@@ -53,8 +54,24 @@ func (h *Handler) GetSavingByUserID(w http.ResponseWriter, r *http.Request, para
 		log.Println(err)
 		return
 	}
+	*/
 
-	renderJSON(w, bytes, http.StatusOK)
+	var saving Saving
+	err = h.DB.QueryRow(`SELECT id, user_id, balance, target, start_date, end_date FROM savings where user_id = $1`, userID).Scan(&saving.ID, &saving.UserID, &saving.Balance, &saving.Target, &saving.StartDate, &saving.EndDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	renderJSON(w, []byte(`
+	{
+		"id": `+strconv.Itoa(saving.ID)+`,
+        "user_id": `+strconv.Itoa(saving.UserID)+`,
+        "balance": `+strconv.Itoa(saving.Balance)+`,
+        "target": `+strconv.Itoa(saving.Target)+`,
+        "start_date": "`+saving.StartDate.String()+`",
+        "end_date": "`+saving.EndDate.String()+`"
+	}
+	`), http.StatusOK )
 }
 
 
@@ -135,7 +152,7 @@ func (h *Handler) EditSaving(w http.ResponseWriter, r *http.Request, param httpr
 	renderJSON(w, []byte(`
 	{
 		status: "success",
-		message: "Update book success!"
+		message: "Update saving success!"
 	}
 	`), http.StatusOK)
 }
@@ -200,7 +217,7 @@ func (h *Handler) AddBalance(w http.ResponseWriter, r *http.Request, param httpr
 		message: "Update balance success!",
 		balance: `+ strconv.Itoa(new_balance) +`,
 		daily_pay: `+ fmt.Sprintf("%.2f", daily_pay) +`,
-		end_date: `+ new_end_date.String() +`
+		end_date: "`+ new_end_date.String() +`"
 	}
 	`), http.StatusOK)
 }
@@ -250,7 +267,7 @@ func (h *Handler) EditEndDate(w http.ResponseWriter, r *http.Request, param http
 	{
 		status: "success",
 		message: "Update End Date success!"
-		daily_pay `+ fmt.Sprintf("%.2f", daily_pay) +`,
+		daily_pay: `+ fmt.Sprintf("%.2f", daily_pay) +`,
 	}
 	`), http.StatusOK)
 }
